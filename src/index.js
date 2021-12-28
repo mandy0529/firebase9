@@ -11,6 +11,7 @@ import {
   where,
   serverTimestamp,
   orderBy,
+  getDoc,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -60,6 +61,16 @@ onSnapshot(when, (doc) => {
   });
   console.log(books, 'books');
 });
+
+//  single product fetch
+const singleRef = doc(collectionRef, '2SlNZ2M6YGdyxfDMq5FG');
+const fetchSingleProduct = () => {
+  onSnapshot(singleRef, (doc) => {
+    const data = doc.data();
+    console.log(data, 'single data');
+  });
+};
+fetchSingleProduct();
 
 //adding documents
 const addBookForm = document.querySelector('.add');
