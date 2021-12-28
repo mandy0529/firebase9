@@ -12,6 +12,7 @@ import {
   serverTimestamp,
   orderBy,
   getDoc,
+  updateDoc,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -67,7 +68,6 @@ const singleRef = doc(collectionRef, '2SlNZ2M6YGdyxfDMq5FG');
 const fetchSingleProduct = () => {
   onSnapshot(singleRef, (doc) => {
     const data = doc.data();
-    console.log(data, 'single data');
   });
 };
 fetchSingleProduct();
@@ -85,11 +85,22 @@ addBookForm.addEventListener('submit', async (e) => {
   console.log(value, 'value');
 });
 
-//deleting decuments
+//deleting documents
 const deleteBookForm = document.querySelector('.delete');
 deleteBookForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const deletedRef = doc(db, 'books', deleteBookForm.id.value);
   await deleteDoc(deletedRef);
   deleteBookForm.reset();
+});
+
+//updateing documents
+const updateBookForm = document.querySelector('.update');
+updateBookForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const updateRef = doc(db, 'books', updateBookForm.id.value);
+  await updateDoc(updateRef, {
+    title: 'updated title!',
+  });
+  updateBookForm.reset();
 });
