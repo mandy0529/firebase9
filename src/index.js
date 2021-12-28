@@ -9,6 +9,8 @@ import {
   onSnapshot,
   query,
   where,
+  serverTimestamp,
+  orderBy,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -29,8 +31,11 @@ const db = getFirestore();
 // collection ref
 const collectionRef = collection(db, 'books');
 
-//query ref
-const q = query(collectionRef, where('author', '==', 'minji'));
+//query ref where
+const toWhere = query(collectionRef, where('author', '==', 'minji'));
+
+// query ref serverstamp
+const when = query(collectionRef, orderBy('createdAt'));
 
 // get collection data ( 리얼타임 안한걸로 collection data 받아오기)
 const getCollection = async () => {
@@ -46,9 +51,9 @@ const getCollection = async () => {
   }
 };
 
-// query로 잡아서  author가 minji인 book만 보여줘! 해주는 옵션 query ! collectionref=>q로 넣어주기
+// query로 잡아서 옵션 정하기  author가 minji인 book만 보여줘! 해주는 옵션 query or 오름차순으로 정렬해줘 ! collectionref=>where 아니면 따로 만들어준 when으로 넣어주기
 // realtime으로 바로바로 업뎃시키기
-onSnapshot(collectionRef, (doc) => {
+onSnapshot(when, (doc) => {
   let books = [];
   doc.docs.map((item) => {
     books.push({...item.data(), id: item.id});
@@ -63,6 +68,7 @@ addBookForm.addEventListener('submit', async (e) => {
   const value = await addDoc(collectionRef, {
     title: addBookForm.title.value,
     author: addBookForm.author.value,
+    createdAt: serverTimestamp(),
   });
   addBookForm.reset();
   console.log(value, 'value');
