@@ -20,6 +20,9 @@ import {
   signOut,
   signInWithEmailAndPassword,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
 } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -48,6 +51,7 @@ const when = query(collectionRef, orderBy('createdAt'));
 
 // auth
 const auth = getAuth();
+const provider = new GoogleAuthProvider();
 
 // get collection data ( 리얼타임 안한걸로 collection data 받아오기)
 const getCollection = async () => {
@@ -145,6 +149,8 @@ loginForm.addEventListener('submit', async (e) => {
     const login = await signInWithEmailAndPassword(auth, email, password);
     // console.log(login.user, 'login');
     logoutBtn.innerHTML = 'logout';
+    loginForm.innerHTML = '';
+    signupForm.innerHTML = '';
     loginForm.reset();
   } catch (error) {
     alert(error);
@@ -157,6 +163,18 @@ logoutBtn.addEventListener('click', async (e) => {
   try {
     await signOut(auth);
     logoutBtn.innerHTML = 'login';
+    const loginFormContent = ` <label for="email">email :</label>
+    <input type="email " name="email" />
+    <label for="password"> password :</label>
+    <input type="password" name="password" />
+    <button>log in</button>`;
+    const signupFormContent = `<label for="email">email :</label>
+    <input type="email " name="email" />
+    <label for="password"> password :</label>
+    <input type="password" name="password" />
+    <button>signup</button>`;
+    loginForm.innerHTML = loginFormContent;
+    signupForm.innerHTML = signupFormContent;
   } catch (error) {
     console.log(error, 'error');
   }
@@ -165,4 +183,18 @@ logoutBtn.addEventListener('click', async (e) => {
 //subscribing to auth changes
 onAuthStateChanged(auth, (user) => {
   console.log('user status changed', user);
+});
+
+//google login
+const googleForm = document.querySelector('.google-login');
+googleForm.addEventListener('click', async () => {
+  await signInWithRedirect(auth, provider);
+  const result = await getRedirectResult(auth);
+  if (result) {
+    // This is the signed-in user
+    const user = result.user;
+    // This gives you a Google Access Token.
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential.accessToken;
+  }
 });
