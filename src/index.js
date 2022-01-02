@@ -14,8 +14,13 @@ import {
   getDoc,
   updateDoc,
 } from 'firebase/firestore';
-import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
-import {async} from '@firebase/util';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signOut,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyD8WuI2siL9wROzTR5_c9ls5qpFgmw0W8Y',
@@ -116,11 +121,48 @@ signupForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = signupForm.email.value;
   const password = signupForm.password.value;
+  try {
+    const createSignUp = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    // console.log(createSignUp.user, 'create sign up');
+    signupForm.reset();
+  } catch (error) {
+    alert(error);
+  }
+});
 
-  const createSignUp = await createUserWithEmailAndPassword(
-    auth,
-    email,
-    password
-  );
-  console.log(createSignUp.user, 'create sign up');
+//login
+const loginForm = document.querySelector('.login');
+const logoutBtn = document.querySelector('.logout');
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = loginForm.email.value;
+  const password = loginForm.password.value;
+  try {
+    const login = await signInWithEmailAndPassword(auth, email, password);
+    // console.log(login.user, 'login');
+    logoutBtn.innerHTML = 'logout';
+    loginForm.reset();
+  } catch (error) {
+    alert(error);
+  }
+});
+
+//logout
+
+logoutBtn.addEventListener('click', async (e) => {
+  try {
+    await signOut(auth);
+    logoutBtn.innerHTML = 'login';
+  } catch (error) {
+    console.log(error, 'error');
+  }
+});
+
+//subscribing to auth changes
+onAuthStateChanged(auth, (user) => {
+  console.log('user status changed', user);
 });
