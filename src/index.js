@@ -14,6 +14,8 @@ import {
   getDoc,
   updateDoc,
 } from 'firebase/firestore';
+import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
+import {async} from '@firebase/util';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyD8WuI2siL9wROzTR5_c9ls5qpFgmw0W8Y',
@@ -38,6 +40,9 @@ const toWhere = query(collectionRef, where('author', '==', 'minji'));
 
 // query ref serverstamp
 const when = query(collectionRef, orderBy('createdAt'));
+
+// auth
+const auth = getAuth();
 
 // get collection data ( 리얼타임 안한걸로 collection data 받아오기)
 const getCollection = async () => {
@@ -94,7 +99,7 @@ deleteBookForm.addEventListener('submit', async (e) => {
   deleteBookForm.reset();
 });
 
-//updateing documents
+//updating documents
 const updateBookForm = document.querySelector('.update');
 updateBookForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -103,4 +108,19 @@ updateBookForm.addEventListener('submit', async (e) => {
     title: 'updated title!',
   });
   updateBookForm.reset();
+});
+
+// sign up
+const signupForm = document.querySelector('.signup');
+signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = signupForm.email.value;
+  const password = signupForm.password.value;
+
+  const createSignUp = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+  console.log(createSignUp.user, 'create sign up');
 });
